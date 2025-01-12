@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "toml++/toml.hpp"
 #include "nya_commonhooklib.h"
+#include "../nya-common-fouc/fo2versioncheck.h"
 
 auto FMODChannels1_call = (void(__stdcall*)(int))0x619F15;
 void __stdcall FMODChannels1(int a1) {
@@ -36,11 +37,7 @@ void __attribute__((naked)) DisableVSyncASM() {
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 	switch( fdwReason ) {
 		case DLL_PROCESS_ATTACH: {
-			if (NyaHookLib::GetEntryPoint() != 0x202638) {
-				MessageBoxA(nullptr, "Unsupported game version! Make sure you're using DRM-free v1.2 (.exe size of 2990080 bytes)", "nya?!~", MB_ICONERROR);
-				exit(0);
-				return TRUE;
-			}
+			DoFlatOutVersionCheck(FO2Version::FO2_1_2);
 
 			auto config = toml::parse_file("FlatOut2FPSUnlocker_gcp.toml");
 			bool bRemoveVSync = config["main"]["remove_vsync"].value_or(false);
